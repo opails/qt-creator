@@ -176,6 +176,16 @@ ProjectExplorerSettings::ProjectExplorerSettings(bool global)
     useJom.setLabel(Tr::tr("Use jom instead of nmake"));
     useJom.setLabelPlacement(BoolAspect::LabelPlacement::Compact);
 
+    autoDetectToolchains.setSettingsKey("AutoDetectToolchains");
+    autoDetectToolchains.setDefaultValue(true);
+    autoDetectToolchains.setLabel(
+        Tr::tr("Auto-detect compilers from system paths on startup"));
+    autoDetectToolchains.setLabelPlacement(BoolAspect::LabelPlacement::Compact);
+    autoDetectToolchains.setToolTip(
+        Tr::tr("When enabled, Qt Creator scans the registry, vswhere and system paths on every "
+               "startup to discover compilers (this runs vcvarsall.bat and similar scripts). "
+               "Disable to keep startup fast if your toolchains are already configured."));
+    
     appEnvChanges.setSettingsKey("AppEnvChanges");
     appEnvChanges.addOnVolatileValueChanged(this, [this] {
         const EnvironmentItems changes =
