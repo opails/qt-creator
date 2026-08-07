@@ -1,10 +1,7 @@
 name: CMake Build Matrix
 
 on:
-  push:
-    paths-ignore:
-      - 'dist/**'
-      - 'doc/**'
+  workflow_dispatch: {}
 
 env:
   QT_VERSION: 6.11.0
