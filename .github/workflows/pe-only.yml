@@ -3,8 +3,8 @@ name: Build ProjectExplorer only
 # 手动触发 + push 到该分支自动跑。手动更稳,不被无关 push 牵着跑。
 on:
   workflow_dispatch: {}
-  push:
-    branches: [ v19.0 ]
+  # push:
+  #   branches: [ v19.0 ]
 
 env:
   QT_VERSION: 6.10.3
