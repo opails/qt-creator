@@ -279,6 +279,7 @@ ProjectExplorerSettings::ProjectExplorerSettings(bool global)
                             useJom,
                         },
                         autoDetectToolchains,
+                        refreshMsvcEnvOnRestore,
                     },
                 },
                 st
