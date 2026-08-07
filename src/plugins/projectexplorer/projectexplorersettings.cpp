@@ -269,7 +269,6 @@ ProjectExplorerSettings::ProjectExplorerSettings(bool global)
                             useJom,
                         },
                         autoDetectToolchains,
-                        }
                     },
                 },
                 st
