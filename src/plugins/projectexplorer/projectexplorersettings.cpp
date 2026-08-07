@@ -267,6 +267,8 @@ ProjectExplorerSettings::ProjectExplorerSettings(bool global)
                                 wordWrap(true)
                             },
                             useJom,
+                        },
+                        autoDetectToolchains,
                         }
                     },
                 },
