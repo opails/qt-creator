@@ -5,6 +5,7 @@
 
 #include "devicesupport/devicemanager.h"
 #include "projectexplorerconstants.h"
+#include "projectexplorersettings.h"
 #include "toolchain.h"
 
 #include <coreplugin/icore.h>
@@ -223,7 +224,9 @@ Toolchains ToolchainSettingsAccessor::restoreToolchains() const
     // Autodect from system paths on the desktop device.
     // The restriction is intentional to keep startup and automatic validation a limited effort
     ToolchainDetector detector(autodetectedUserFileTcs, DeviceManager::defaultDesktopDevice(), {});
-    const Toolchains autodetectedTcs = autoDetectToolchains(detector);
+    const bool autoDetect = globalProjectExplorerSettings().autoDetectToolchains();
+    const Toolchains autodetectedTcs = autoDetect ? autoDetectToolchains(detector)
+                                                  : Toolchains();
 
     // merge tool chains and register those that we need to keep:
     const ToolChainOperations ops = mergeToolChainLists(systemFileTcs, userFileTcs, autodetectedTcs);
