@@ -1,6 +1,7 @@
 name: Aggregate MCP Registry
 
 on:
+  workflow_dispatch: {}
   # schedule:
   #   - cron: "0 * * * *" # every hour at :00
   # workflow_dispatch:
