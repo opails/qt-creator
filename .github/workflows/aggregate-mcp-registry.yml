@@ -1,9 +1,9 @@
 name: Aggregate MCP Registry
 
 on:
-  schedule:
-    - cron: "0 * * * *" # every hour at :00
-  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 * * * *" # every hour at :00
+  # workflow_dispatch:
     # manual trigger from GitHub UI
 
 jobs:
