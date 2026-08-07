@@ -21,7 +21,15 @@ jobs:
         shell: bash
         run: git submodule update --init --recursive
 
-      # 3. 装 Qt —— aqtinstall,版本对齐 19.0 的 6.10.3,模块对齐官方 build_cmake.yml
+      # 3. 在 windows runner 上激活 MSVC 开发环境,把 cl.exe 加进 PATH,
+      #    否则下一步 CMake configure 会报 "Could not find compiler set in
+      #    environment variable CC: cl". 必须在 Install Qt 之前。
+      - name: Setup MSVC dev environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # 4. 装 Qt —— aqtinstall,版本对齐 19.0 的 6.10.3,模块对齐官方 build_cmake.yml
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -32,7 +40,7 @@ jobs:
           modules: 'qtshadertools qtquick3d qtquicktimeline qtserialport qt5compat'
           cache: true
 
-      # 4. configure —— 只生成构建文件,不编。关掉测试,关掉文档,加快。
+      # 5. configure —— 只生成构建文件,不编。关掉测试,关掉文档,加快。
       - name: Configure
         shell: bash
         run: |
@@ -41,13 +49,13 @@ jobs:
             -DWITH_TESTS=OFF \
             -DBUILD_DOCS=OFF
 
-      # 5. 只编 ProjectExplorer 这一个 target(它的依赖 Core/TextEditor/Utils
+      # 6. 只编 ProjectExplorer 这一个 target(它的依赖 Core/TextEditor/Utils
       #    等会被一起编出来,但其他无关插件不编,省大量时间)
       - name: Build ProjectExplorer
         shell: bash
         run: cmake --build build --target ProjectExplorer
 
-      # 6. 把产出的 dll 上传,跑完可在 Actions 页下载,证明编译通过
+      # 7. 把产出的 dll 上传,跑完可在 Actions 页下载,证明编译通过
       - name: Upload plugin
         uses: actions/upload-artifact@v4
         with:
