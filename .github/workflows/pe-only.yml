@@ -19,12 +19,14 @@ jobs:
       # 2. 拉 submodule(qlitehtml 等);19.0 也用了,跳过会 configure 失败。
       #    perfparser 用了相对 URL(../perfparser.git),fork 后被 GitHub 解析成
       #    <你>/perfparser 仓库,而你账号下没有这个仓库,git 拉时挂掉。
-      #    ProjectExplorer 编译不需要 perfparser,故把它从 .gitmodules 里删掉,
-      #    下一步 git submodule update 就根本不知道有这条 submodule。
+      #    ProjectExplorer 编译不需要 perfparser,故把它从 .gitmodules / git 索引
+      #    全部摘掉,下一步 git submodule update 就根本不知道有这条 submodule。
       - name: Checkout submodules (skip perfparser)
         shell: bash
         run: |
           git config -f .gitmodules --remove-section submodule.perfparser || true
+          git rm -f --cached src/tools/perfparser >/dev/null 2>&1 || true
+          rm -rf .git/modules/src/tools/perfparser 2>/dev/null || true
           git submodule sync
           git submodule update --init --recursive
 
