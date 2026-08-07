@@ -16,10 +16,15 @@ jobs:
       # 1. 拉你 fork 的源码(默认只拉一层,不带 submodule)
       - uses: actions/checkout@v4
 
-      # 2. 拉 submodule(qlitehtml 等);19.0 也用了,跳过会 configure 失败
-      - name: Checkout submodules
+      # 2. 拉 submodule(qlitehtml 等);19.0 也用了,跳过会 configure 失败。
+      #    perfparser 用了相对 URL(../perfparser.git),fork 后被 GitHub 解析成
+      #    <你>/perfparser 仓库,而你账号下没有这个仓库,git 拉时挂掉。
+      #    ProjectExplorer 编译不需要 perfparser,故禁掉这一条 submodule 即可。
+      - name: Checkout submodules (skip perfparser)
         shell: bash
-        run: git submodule update --init --recursive
+        run: |
+          git config submodule.src/tools/perfparser.update none
+          git submodule update --init --recursive
 
       # 3. 在 windows runner 上激活 MSVC 开发环境,把 cl.exe 加进 PATH,
       #    否则下一步 CMake configure 会报 "Could not find compiler set in
