@@ -185,6 +185,16 @@ ProjectExplorerSettings::ProjectExplorerSettings(bool global)
         Tr::tr("When enabled, Qt Creator scans the registry, vswhere and system paths on every "
                "startup to discover compilers (this runs vcvarsall.bat and similar scripts). "
                "Disable to keep startup fast if your toolchains are already configured."));
+
+    refreshMsvcEnvOnRestore.setSettingsKey("RefreshMsvcEnvOnRestore");
+    refreshMsvcEnvOnRestore.setDefaultValue(true);
+    refreshMsvcEnvOnRestore.setLabel(
+        Tr::tr("Re-run vcvarsall.bat on startup to refresh the MSVC environment"));
+    refreshMsvcEnvOnRestore.setLabelPlacement(BoolAspect::LabelPlacement::Compact);
+    refreshMsvcEnvOnRestore.setToolTip(
+        Tr::tr("When enabled, each restored MSVC toolchain re-runs vcvarsall.bat on startup to "
+               "regenerate its environment. When disabled, Qt Creator reuses the cached "
+               "environment stored in the toolchain file, so no cmd is spawned during restore."));
     
     appEnvChanges.setSettingsKey("AppEnvChanges");
     appEnvChanges.addOnVolatileValueChanged(this, [this] {
