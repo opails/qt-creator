@@ -1,0 +1,78 @@
+name: Build ProjectExplorer only
+
+# 手动触发 + push 到该分支自动跑。手动更稳,不被无关 push 牵着跑。
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ "build-pe-v19.0.0" ]
+
+env:
+  QT_VERSION: 6.10.3
+
+jobs:
+  build-pe:
+    runs-on: windows-2022
+    steps:
+      # 1. 拉你 fork 的源码(不带 submodule,我们手动 clone 需要的那几条)
+      - uses: actions/checkout@v4
+        with:
+          submodules: false
+
+      # 2. 手动 clone 编 ProjectExplorer 真正需要的 submodule,绕开 git 子模块体系。
+      #    原因:perfparser 的 URL 是相对路径 ../perfparser.git,fork 后被解析成
+      #    <你>/perfparser 而拉不到;且 git 索引里 perfparser 这条 gitlink 一旦缺
+      #    .gitmodules 对应条目,git submodule init/update 直接 128 报错退出,没法
+      #    用 submodule.<path>.update=none 或 git rm --cached 绕过。所以干脆不靠
+      #    git submodule 命令,自己 clone 该拉的几条即可。
+      - name: Checkout needed submodules manually
+        shell: bash
+        run: |
+          set -e
+          # qlitehtml:被代码模型/Help 之类使用,需要。
+          git clone --depth 1 https://code.qt.io/playground/qlitehtml.git src/libs/qlitehtml
+          # googletest 和 qbs:ProjectExplorer 不依赖,但 configure 阶段 CMake 找库时
+          # 若 .gitmodules 里登记了它们的 path,可能走 1st-party 检查,先 clone 占位
+          # 一份空目录即可让 CMake 满意。
+          mkdir -p src/libs/3rdparty/googletest src/shared/qbs src/tools/perfparser
+
+      # 3. 在 windows runner 上激活 MSVC 开发环境,把 cl.exe 加进 PATH,
+      #    否则下一步 CMake configure 会报 "Could not find compiler set in
+      #    environment variable CC: cl". 必须在 Install Qt 之前。
+      - name: Setup MSVC dev environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # 4. 装 Qt —— aqtinstall,版本对齐 19.0 的 6.10.3,模块对齐官方 build_cmake.yml
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.10.3'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtshadertools qtquick3d qtquicktimeline qtserialport qt5compat'
+          cache: true
+
+      # 5. configure —— 只生成构建文件,不编。关掉测试,关掉文档,加快。
+      - name: Configure
+        shell: bash
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DWITH_TESTS=OFF \
+            -DBUILD_DOCS=OFF
+
+      # 6. 只编 ProjectExplorer 这一个 target(它的依赖 Core/TextEditor/Utils
+      #    等会被一起编出来,但其他无关插件不编,省大量时间)
+      - name: Build ProjectExplorer
+        shell: bash
+        run: cmake --build build --target ProjectExplorer
+
+      # 7. 把产出的 dll 上传,跑完可在 Actions 页下载,证明编译通过
+      - name: Upload plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProjectExplorer-dll
+          path: build/**/ProjectExplorer*.dll
+          if-no-files-found: error
