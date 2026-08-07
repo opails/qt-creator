@@ -47,6 +47,7 @@ public:
     Utils::BoolAspect deployBeforeRun{this};
     Utils::BoolAspect saveBeforeBuild{this};
     Utils::BoolAspect useJom{this};
+    Utils::BoolAspect autoDetectToolchains{this};
     Utils::BoolAspect promptToStopRunControl{this};
     Utils::BoolAspect automaticallyCreateRunConfigurations{this};
     Utils::TypedSelectionAspect<SyncRunConfigs> syncRunConfigurations{this};
