@@ -1131,8 +1131,10 @@ void MsvcToolchain::fromMap(const Store &data)
         data.value(environModsKeyC).toList());
     rescanForCompiler();
 
-    initEnvModWatcher(Utils::asyncRun(envModThreadPool(), &environmentModifications,
-                                      m_vcvarsBat, m_varsBatArg));
+    if (globalProjectExplorerSettings().refreshMsvcEnvOnRestore()) {
+        initEnvModWatcher(Utils::asyncRun(envModThreadPool(), &environmentModifications,
+                                          m_vcvarsBat, m_varsBatArg));
+    }
 
     if (m_vcvarsBat.isEmpty() || !targetAbi().isValid()) {
         reportError();
