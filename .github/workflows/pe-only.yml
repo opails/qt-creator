@@ -4,7 +4,7 @@ name: Build ProjectExplorer only
 on:
   workflow_dispatch: {}
   push:
-    branches: [ build-pe ]
+    branches: [ v19.0 ]
 
 env:
   QT_VERSION: 6.10.3
